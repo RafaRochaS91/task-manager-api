@@ -6,17 +6,25 @@ import {
   Patch,
   Body,
   Param,
+  Query,
 } from '@nestjs/common';
 import { TasksService } from './tasks.service';
 import { Task, TaskStatus } from './tasks.model';
 import { CreateTaskDto } from './dto/create-task.dto';
+import { GetTasksFilterDto } from './dto/get-tasks-filter.dto';
 
 @Controller('/tasks')
 export class TasksController {
   constructor(private taskService: TasksService) {}
 
   @Get()
-  getAllTasks(): Task[] {
+  getTasks(@Query() filterDto: GetTasksFilterDto): Task[] {
+    const hasQueryParams = Object.keys(filterDto).length > 0;
+
+    if (hasQueryParams) {
+      return this.taskService.getTasksWithFilters(filterDto);
+    }
+
     return this.taskService.getAllTasks();
   }
 
