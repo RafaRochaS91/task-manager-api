@@ -28,12 +28,14 @@ export class TasksService {
   }
 
   async deleteTask(id: number) {
-    const found = await this.taskRepository.findOne(id);
-
-    if (!found) {
-      throw new NotFoundException(`Task with id: ${id} was not found`);
-    }
+    await this.taskRepository.findOne(id);
 
     return this.taskRepository.deleteTask(id);
+  }
+
+  async updateTaskStatus(id: number, status: TaskStatus) {
+    await this.getTaskById(id);
+
+    return this.taskRepository.updateTaskStatus(id, status);
   }
 }
