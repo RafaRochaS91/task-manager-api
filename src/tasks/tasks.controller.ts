@@ -22,6 +22,11 @@ import { Task } from './task.entity';
 export class TasksController {
   constructor(private taskService: TasksService) {}
 
+  @Get()
+  getTasks(@Query(ValidationPipe) filterDto: GetTasksFilterDto) {
+    return this.taskService.getTasks(filterDto);
+  }
+
   @Get('/:id')
   getTaskById(@Param('id', ParseIntPipe) id: number): Promise<Task> {
     return this.taskService.getTaskById(id);
@@ -38,7 +43,10 @@ export class TasksController {
   }
 
   @Patch('/:id/status')
-  updateTask(@Param('id', ParseIntPipe) id: number, @Body('status', TaskStatusValitationPipe) status: TaskStatus) {
+  updateTask(
+    @Param('id', ParseIntPipe) id: number,
+    @Body('status', TaskStatusValitationPipe) status: TaskStatus,
+  ) {
     return this.taskService.updateTaskStatus(id, status);
   }
 }
