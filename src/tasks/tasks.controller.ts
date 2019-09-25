@@ -7,7 +7,6 @@ import {
   Body,
   Param,
   Query,
-  UsePipes,
   ValidationPipe,
   ParseIntPipe,
 } from '@nestjs/common';
