@@ -33,7 +33,7 @@ export class TaskRepository extends Repository<Task> {
   async createTask(createTaskDto: CreateTaskDto, user: User): Promise<Task> {
     const { title, description } = createTaskDto;
     try {
-      const newTask = await this.insert({ title, description, status: 'OPEN', user });
+      const newTask = await this.insert({ title, description, status: TaskStatus.OPEN, user });
 
       return newTask.raw;
     } catch ({ message }) {
