@@ -2,20 +2,21 @@ import { Test } from '@nestjs/testing';
 import { TasksService } from './tasks.service';
 import { TaskRepository } from './task.repository';
 import { GetTasksFilterDto } from './dto/get-tasks-filter.dto';
-import { User } from 'src/auth/user.entity';
 import { TaskStatus } from './task-status.type';
+import { NotFoundException } from '@nestjs/common';
 
 const mockUser = {
   username: 'Test user',
-
+  id: 12,
 }
 
 const mockTaskRepository = () => ({
   getTasks: jest.fn(),
+  findOne: jest.fn(),
 });
 
 describe('TaskService', () => {
-  let taskService;
+  let tasksService;
   let taskRepository;
 
   beforeEach(async () => {
@@ -26,7 +27,7 @@ describe('TaskService', () => {
       ]
     }).compile();
 
-    taskService = await module.get<TasksService>(TasksService);
+    tasksService = await module.get<TasksService>(TasksService);
     taskRepository = await module.get<TaskRepository>(TaskRepository);
   });
 
@@ -37,10 +38,24 @@ describe('TaskService', () => {
       const filters: GetTasksFilterDto = { status: TaskStatus.IN_PROGRESS, searchTerm: 'Some search query' }
 
       // call tasksService.getTasks
-      taskService.getTasks(filters, mockUser);
+      tasksService.getTasks(filters, mockUser);
 
       expect(taskRepository.getTasks).toHaveBeenCalled();
     });
   });
 
+  describe('getTaskById', () => {
+    it ('calls the taskRespository.findOne() and successfully retrieve and return a task', async () => {
+      const mockTask = { title: 'Test Task', description: 'Test desc' };
+      taskRepository.findOne.mockResolvedValue(mockTask);
+
+      const result = await tasksService.getTaskById(1, mockUser);
+      expect(result).toEqual(mockTask);
+    });
+
+    it ('throws an error if no task is found', () => {
+      taskRepository.findOne.mockResolvedValue(null);
+      expect(tasksService.getTaskById(1, mockUser)).rejects.toThrow(NotFoundException);
+    });
+  });
 });
