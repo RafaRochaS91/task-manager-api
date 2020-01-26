@@ -30,12 +30,13 @@ export class TaskRepository extends Repository<Task> {
     return tasks;
   }
 
-  async createTask(createTaskDto: CreateTaskDto, user: User): Promise<Task> {
+  async createTask(createTaskDto: CreateTaskDto, user: User): Promise<Partial<Task>> {
     const { title, description } = createTaskDto;
     try {
-      const newTask = await this.insert({ title, description, status: TaskStatus.OPEN, user });
+      const status = TaskStatus.OPEN;
+      await this.insert({ title, description, status, user });
 
-      return newTask.raw;
+      return { title, description };
     } catch ({ message }) {
       throw new InternalServerErrorException(message);
     }
